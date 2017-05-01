@@ -7,3 +7,7 @@ class Todo(models.Model):
     fecha_finalizado = models.DateTimeField()
     propietario = models.ForeignKey(User)
     todo = models.TextField()
+    hecho = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '{} - {}'.format(self.propietario, self.todo)
