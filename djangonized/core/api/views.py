@@ -20,6 +20,13 @@ class UserView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+class UserDetail(APIView):
+    def get(self, request, pk, format=None):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class TodoList(APIView):
     def get(self, request, format=None):
         todos = Todo.objects.all()
