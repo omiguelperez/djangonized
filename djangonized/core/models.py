@@ -3,11 +3,11 @@ from django.db import models
 
 
 class Todo(models.Model):
-    fecha_creado = models.DateTimeField(auto_now_add=True)
-    fecha_finalizado = models.DateTimeField()
-    propietario = models.ForeignKey(User)
+    created_date = models.DateTimeField(auto_now_add=True)
+    ended_date= models.DateTimeField()
+    owner = models.ForeignKey(User)
     todo = models.TextField()
-    hecho = models.BooleanField(default=False)
+    done = models.BooleanField(default=False)
 
     def __str__(self):
-        return '{} - {}'.format(self.propietario, self.todo)
+        return '{} - {}'.format(self.owner, self.todo)

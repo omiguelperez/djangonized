@@ -4,11 +4,11 @@ from .models import Todo
 
 
 class TodoAdmin(admin.ModelAdmin):
-    list_display = ('propietario', 'todo', 'hecho',)
-    exclude = ('propietario',)
+    list_display = ('owner', 'todo', 'done',)
+    exclude = ('onwer',)
 
     def save_model(self, request, obj, form, change):
-        obj.propietario = request.user
+        obj.onwer = request.user
         obj.save()
 
 admin.site.register(Todo, TodoAdmin)
