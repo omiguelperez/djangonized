@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -19,8 +20,15 @@ class UserView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class TodoView(APIView):
+class TodoList(APIView):
     def get(self, request, format=None):
         todos = Todo.objects.all()
         serializer = TodoSerializer(todos, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TodoDetail(APIView):
+    def get(self, request, pk, format=None):
+        todo = get_object_or_404(Todo, pk=pk)
+        serializer = TodoSerializer(todo)
         return Response(serializer.data, status=status.HTTP_200_OK)
