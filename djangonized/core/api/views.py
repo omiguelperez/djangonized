@@ -4,13 +4,17 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 
+
 from core.models import Todo
-from .serializers import UserSerializer, TodoSerializer
+from .serializers import (
+    UserSerializer,
+    HyperlinkedTodoSerializer)
 
 
 class HelloWorldView(APIView):
     def get(self, request, name, format=None):
-        return Response({'mensaje': 'Bienvenido %s, al mundo de Django Rest Framework' % name})
+        return Response({'mensaje': 'Bienvenido {}, al mundo de Django Rest '
+                                    'Framework'.format(name)})
 
 
 class UserView(APIView):
@@ -30,11 +34,12 @@ class UserDetail(APIView):
 
 
 class TodoList(APIView):
-    serializer_class = TodoSerializer
+    serializer_class = HyperlinkedTodoSerializer
 
     def get(self, request, format=None):
         todos = Todo.objects.all()
-        serializer = TodoSerializer(todos, many=True)
+        serializer = self.serializer_class(todos, many=True,
+                                           context={'request': request})
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -44,11 +49,14 @@ class TodoList(APIView):
             serializer.save()
             return Response(serializer.data)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class TodoDetail(APIView):
+    serializer_class = HyperlinkedTodoSerializer
+
     def get(self, request, pk, format=None):
         todo = get_object_or_404(Todo, pk=pk)
-        serializer = TodoSerializer(todo)
+        serializer = self.serializer_class(todo, context={'request': request})
         return Response(serializer.data)

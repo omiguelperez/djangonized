@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer
+from rest_framework.relations import HyperlinkedRelatedField
+from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer
 
 from core.models import Todo
 
@@ -15,3 +16,15 @@ class TodoSerializer(ModelSerializer):
         model = Todo
         fields = ('id', 'created_date', 'ended_date', 'owner', 'todo', 'done',)
         read_only_fields = ('owner',)
+
+
+class HyperlinkedTodoSerializer(HyperlinkedModelSerializer):
+    owner = HyperlinkedRelatedField(
+        many=False,
+        view_name='users_detail',
+        read_only=True
+    )
+
+    class Meta:
+        model = Todo
+        fields = ('id', 'created_date', 'ended_date', 'owner', 'todo', 'done',)
