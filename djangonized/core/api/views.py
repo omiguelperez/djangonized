@@ -8,7 +8,8 @@ from rest_framework.views import APIView
 from core.models import Todo
 from .serializers import (
     UserSerializer,
-    HyperlinkedTodoSerializer)
+    TodoSerializer
+)
 
 
 class HelloWorldView(APIView):
@@ -34,12 +35,11 @@ class UserDetail(APIView):
 
 
 class TodoList(APIView):
-    serializer_class = HyperlinkedTodoSerializer
+    serializer_class = TodoSerializer
 
     def get(self, request, format=None):
         todos = Todo.objects.all()
-        serializer = self.serializer_class(todos, many=True,
-                                           context={'request': request})
+        serializer = self.serializer_class(todos, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
@@ -54,9 +54,9 @@ class TodoList(APIView):
 
 
 class TodoDetail(APIView):
-    serializer_class = HyperlinkedTodoSerializer
+    serializer_class = TodoSerializer
 
     def get(self, request, pk, format=None):
         todo = get_object_or_404(Todo, pk=pk)
-        serializer = self.serializer_class(todo, context={'request': request})
+        serializer = self.serializer_class(todo)
         return Response(serializer.data)

@@ -12,6 +12,8 @@ class UserSerializer(ModelSerializer):
 
 
 class TodoSerializer(ModelSerializer):
+    owner = UserSerializer(read_only=True)
+
     class Meta:
         model = Todo
         fields = ('id', 'created_date', 'ended_date', 'owner', 'todo', 'done',)
