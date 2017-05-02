@@ -1,11 +1,12 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
+router = DefaultRouter()
+router.register(r'users', views.UserViewSet)
+router.register(r'todos', views.TodoViewSet)
+
 urlpatterns = [
-    url(r'^hello-world/(?P<name>[\w]+)/', views.HelloWorldView.as_view(), name='hello_world'),
-    url(r'^users/(?P<pk>[\d]+)/', views.UserDetail.as_view(), name='users_detail'),
-    url(r'^users/', views.UserView.as_view(), name='users_list'),
-    url(r'^todos/(?P<pk>[\d]+)/', views.TodoDetail.as_view(), name='todos_detail'),
-    url(r'^todos/', views.TodoList.as_view(), name='todos_list'),
+    url(r'^', include(router.urls)),
 ]

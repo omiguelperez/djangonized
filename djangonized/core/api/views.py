@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-
+from rest_framework.viewsets import ModelViewSet
 
 from core.models import Todo
 from .serializers import (
@@ -12,51 +12,20 @@ from .serializers import (
 )
 
 
-class HelloWorldView(APIView):
-    def get(self, request, name, format=None):
-        return Response({'mensaje': 'Bienvenido {}, al mundo de Django Rest '
-                                    'Framework'.format(name)})
-
-
-class UserView(APIView):
+class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
-
-    def get(self, request, format=None):
-        users = User.objects.all()
-        serializer = self.serializer_class(users, many=True)
-        return Response(serializer.data)
+    queryset = User.objects.all()
 
 
-class UserDetail(APIView):
-    def get(self, request, pk, format=None):
-        user = get_object_or_404(User, pk=pk)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-
-class TodoList(APIView):
+class TodoViewSet(ModelViewSet):
     serializer_class = TodoSerializer
+    queryset = Todo.objects.all()
 
-    def get(self, request, format=None):
-        todos = Todo.objects.all()
-        serializer = self.serializer_class(todos, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, format=None):
+    def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            serializer.validated_data['owner'] = request.user
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.validated_data['owner'] = request.user
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED,
+                        headers=self.get_success_headers(serializer.data))
 
-
-class TodoDetail(APIView):
-    serializer_class = TodoSerializer
-
-    def get(self, request, pk, format=None):
-        todo = get_object_or_404(Todo, pk=pk)
-        serializer = self.serializer_class(todo)
-        return Response(serializer.data)
