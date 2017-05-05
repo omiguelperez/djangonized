@@ -30,6 +30,9 @@ class TodoViewSet(ModelViewSet):
         if 'username' in query:
             owner = get_object_or_404(User, username=query.get('username'))
             queryset = queryset.filter(owner=owner)
+        if 'done' in query:
+            done = True if query.get('done') == 'true' else False
+            queryset = queryset.filter(done=done)
         return queryset
 
     def list(self, request, *args, **kwargs):
