@@ -1,6 +1,10 @@
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.filters import DjangoFilterBackend, SearchFilter, OrderingFilter
+from rest_framework.decorators import detail_route
+from rest_framework.filters import (
+    DjangoFilterBackend,
+    SearchFilter,
+    OrderingFilter)
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -10,14 +14,31 @@ from .permissions import IsOwnerPermissions
 from core.models import Todo
 from .serializers import (
     UserSerializer,
-    TodoSerializer
-)
+    TodoSerializer,
+    SetPasswordSerializer)
 
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = (DjangoModelPermissions,)
+
+    @detail_route(methods=['post'])
+    def set_password(self, request, pk):
+        user = self.get_object()
+        if request.user == user:
+            serializer = SetPasswordSerializer(data=request.data)
+            if serializer.is_valid():
+                user.set_password(serializer.validated_data.get('password1'))
+                user.save()
+                return Response({'status': 'Contraseña cambiada correctamente.'})
+            else:
+                return Response(serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({
+                'errors': 'Un usuario solo puede cambiar su propia contraseña.'
+            }, status=status.HTTP_403_FORBIDDEN)
 
 
 class TodoViewSet(ModelViewSet):
