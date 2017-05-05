@@ -1,10 +1,11 @@
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.filters import DjangoFilterBackend
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from .filters import TodoFilter
 from .permissions import IsOwnerPermissions
 from core.models import Todo
 from .serializers import (
@@ -23,17 +24,8 @@ class TodoViewSet(ModelViewSet):
     serializer_class = TodoSerializer
     queryset = Todo.objects.all()
     permission_classes = (IsOwnerPermissions,)
-
-    def get_queryset(self):
-        query = self.request.query_params
-        queryset = self.queryset
-        if 'username' in query:
-            owner = get_object_or_404(User, username=query.get('username'))
-            queryset = queryset.filter(owner=owner)
-        if 'done' in query:
-            done = True if query.get('done') == 'true' else False
-            queryset = queryset.filter(done=done)
-        return queryset
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = TodoFilter
 
     def list(self, request, *args, **kwargs):
         return super(TodoViewSet, self).list(request, *args, **kwargs)
