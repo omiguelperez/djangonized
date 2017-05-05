@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import status
-from rest_framework.filters import DjangoFilterBackend
+from rest_framework.filters import DjangoFilterBackend, SearchFilter
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -24,11 +24,9 @@ class TodoViewSet(ModelViewSet):
     serializer_class = TodoSerializer
     queryset = Todo.objects.all()
     permission_classes = (IsOwnerPermissions,)
-    filter_backends = (DjangoFilterBackend,)
+    filter_backends = (DjangoFilterBackend, SearchFilter,)
     filter_class = TodoFilter
-
-    def list(self, request, *args, **kwargs):
-        return super(TodoViewSet, self).list(request, *args, **kwargs)
+    search_fields = ('=owner__username', 'owner__email')
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
