@@ -11,7 +11,7 @@ class IsOwnerPermissions(BasePermission):
         elif request.method == 'PUT' or request.method == 'PATCH':
             return True
         elif request.method == 'POST':
-            return False
+            return request.user.is_superuser
 
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
@@ -22,6 +23,17 @@ class TodoViewSet(ModelViewSet):
     serializer_class = TodoSerializer
     queryset = Todo.objects.all()
     permission_classes = (IsOwnerPermissions,)
+
+    def get_queryset(self):
+        query = self.request.query_params
+        queryset = self.queryset
+        if 'username' in query:
+            owner = get_object_or_404(User, username=query.get('username'))
+            queryset = queryset.filter(owner=owner)
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        return super(TodoViewSet, self).list(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
