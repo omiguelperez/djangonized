@@ -9,6 +9,7 @@ from rest_framework.permissions import DjangoModelPermissions
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
+from core.pagination import StandardResultsSetPagination
 from .filters import TodoFilter
 from .permissions import IsOwnerPermissions
 from core.models import Todo
@@ -49,6 +50,7 @@ class TodoViewSet(ModelViewSet):
     filter_class = TodoFilter
     search_fields = ('=owner__username', 'owner__email')
     ordering_fields = ('done',)
+    pagination_class = StandardResultsSetPagination
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
